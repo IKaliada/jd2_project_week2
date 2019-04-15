@@ -28,9 +28,9 @@ public class App {
 
         DocumentDTO documentDTOfromDatabase = documentController.add(documentDTO);
         documentDTO = documentController.getDocumentById(id);
-        logger.info(documentDTO);
-        logger.info("Document from database " + documentDTOfromDatabase);
-        documentController.delete(id);
+        logger.info(documentDTOfromDatabase);
+        logger.info("Document from database " + documentDTO);
+//        documentController.delete(id);
 
     }
 }

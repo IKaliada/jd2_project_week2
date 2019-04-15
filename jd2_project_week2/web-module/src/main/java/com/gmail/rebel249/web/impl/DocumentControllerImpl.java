@@ -13,9 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentControllerImpl implements DocumentController {
 
-    private static final Logger logger = LogManager.getLogger(DocumentControllerImpl.class);
     private static final String REGEX = "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-" +
             "[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}";
+    private static final Long EDGE = 100L;
+    private static final String NOT_VALID_MESSAGE = "Not valid value!";
+    private static final String DOCUMENT_NULL_MESSAGE = "Document is null!";
 
     private DocumentService documentService;
 
@@ -26,42 +28,42 @@ public class DocumentControllerImpl implements DocumentController {
 
     @Override
     public DocumentDTO add(DocumentDTO documentDTO) {
-        validate(documentDTO);
-        try {
-            return documentService.add(documentDTO);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException();
+        if (documentDTO == null){
+            throw new NullDocumentDTOException(DOCUMENT_NULL_MESSAGE);
         }
+        validate(documentDTO);
+        documentDTO = documentService.add(documentDTO);
+        validateReturningDocumentDTO(documentDTO);
+        return documentDTO;
     }
 
-    private DocumentDTO validate(DocumentDTO documentDTO) {
-        if (documentDTO == null) {
-            throw new NullDocumentDTOException();
-        } else if (documentDTO.getDescription().length() < 100
-                && !documentDTO.getUniqueNumber().toString().isEmpty()
-                && documentDTO.getUniqueNumber().toString().matches(REGEX)) {
-            return documentDTO;
-        } else throw new NotValidValueException();
+    private void validate(DocumentDTO documentDTO) {
+        if (documentDTO.getDescription().length() > EDGE
+                || documentDTO.getUniqueNumber().toString().isEmpty()
+                || !documentDTO.getUniqueNumber().toString().matches(REGEX)) {
+            throw new NotValidValueException(NOT_VALID_MESSAGE);
+        }
     }
 
     @Override
     public DocumentDTO getDocumentById(Long id) {
-        if (id != 0) {
-            DocumentDTO documentDTO = documentService.getDocumentById(id);
-            try {
-                return documentDTO;
-            } catch (NullPointerException e) {
-                logger.error(e.getMessage(), e);
-                throw new RuntimeException();
-            }
-        } else throw new NotValidValueException();
+        validateId(id);
+        DocumentDTO documentDTO = documentService.getDocumentById(id);
+        validateReturningDocumentDTO(documentDTO);
+        return documentDTO;
     }
 
     @Override
     public void delete(Long id) {
-        if (id != 0) {
-            documentService.delete(id);
-        } else throw new NotValidValueException();
+        validateId(id);
+        documentService.delete(id);
+    }
+
+    private void validateId(Long id) {
+        if (id == null) throw new NotValidValueException(NOT_VALID_MESSAGE);
+    }
+
+    private void validateReturningDocumentDTO(DocumentDTO documentDTO) {
+        if (documentDTO == null) throw new NullDocumentDTOException(DOCUMENT_NULL_MESSAGE);
     }
 }

@@ -26,10 +26,10 @@ public class DocumentServiceImpl implements DocumentService {
 
     public DocumentDTO add(DocumentDTO documentDTO) {
 
-        logger.info(documentDTO.getDescription());
         MyDocument myDocument = appRepository.add(documentConverter.fromDocumentDTO(documentDTO));
-        logger.info(myDocument);
-        return documentConverter.toDocumentDTO(myDocument);
+        DocumentDTO documentDTO1 = documentConverter.toDocumentDTO(myDocument);
+        logger.info("DTO in service " + documentDTO1);
+        return documentDTO1;
     }
 
     @Override

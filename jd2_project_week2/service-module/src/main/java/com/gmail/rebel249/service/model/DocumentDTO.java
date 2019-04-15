@@ -39,7 +39,9 @@ public class DocumentDTO {
 
     @Override
     public String toString() {
-        return "DocumentDTO{uniqueNumber=" + uniqueNumber +
+        return "DocumentDTO{" +
+                "id=" + id +
+                ", uniqueNumber=" + uniqueNumber +
                 ", description='" + description + '\'' +
                 '}';
     }
